@@ -5,13 +5,14 @@ import sys
 import subprocess
 from pathlib import Path
 
-def compile_and_run(contest, problem, compile_only=False):
-    """Compile and run a problem (runs by default unless compile_only is True)"""
+def compile_and_run(contest, problem, compile_only=False, manual_input=False, input_file=None):
+    """Compile and run a problem"""
     
     # Create paths
     problem_dir = Path("problems") / contest
     cpp_file = problem_dir / f"{problem}.cpp"
     exe_file = problem_dir / problem
+    default_input = problem_dir / "input.txt"
     
     # Check if source file exists
     if not cpp_file.exists():
@@ -35,7 +36,27 @@ def compile_and_run(contest, problem, compile_only=False):
     if not compile_only:
         print(f"Running {exe_file}...")
         print("=" * 40)
-        subprocess.run([str(exe_file)])
+        
+        if manual_input:
+            # Manual input mode
+            print("Manual input mode - type your input (Ctrl+D when done):")
+            subprocess.run([str(exe_file)])
+        elif input_file and Path(input_file).exists():
+            # Specific input file
+            print(f"Using input from: {input_file}")
+            with open(input_file, 'r') as f:
+                subprocess.run([str(exe_file)], stdin=f)
+        elif default_input.exists():
+            # Default input.txt file
+            print(f"Using input from: {default_input}")
+            with open(default_input, 'r') as f:
+                subprocess.run([str(exe_file)], stdin=f)
+        else:
+            # No input file found, fall back to manual
+            print(f"No {default_input} found - manual input mode:")
+            print("Type your input (Ctrl+D when done):")
+            subprocess.run([str(exe_file)])
+        
         print("=" * 40)
     
     return True
@@ -44,12 +65,21 @@ def show_help():
     print("Codeforces Compiler & Runner")
     print()
     print("Usage:")
-    print("  python run.py <contest> <problem> [compile]")
+    print("  python run.py <contest> <problem> [options]")
+    print()
+    print("Options:")
+    print("  compile                    Just compile, don't run")
+    print("  manual                     Use manual input instead of input.txt")
+    print("  -i <file>                  Use specific input file")
     print()
     print("Examples:")
-    print("  python run.py 50 A           # Compile and run (default)")
-    print("  python run.py 50 A compile   # Just compile, don't run")
-    print("  python run.py 1789 B         # Compile and run")
+    print("  python run.py 50 A                    # Use problems/50/input.txt (default)")
+    print("  python run.py 50 A manual             # Manual input via terminal")
+    print("  python run.py 50 A compile            # Just compile")
+    print("  python run.py 50 A -i test.txt        # Use specific input file")
+    print()
+    print("Default behavior:")
+    print("  Automatically uses problems/<contest>/input.txt if it exists")
 
 def main():
     if len(sys.argv) < 3:
@@ -58,9 +88,25 @@ def main():
     
     contest = sys.argv[1]
     problem = sys.argv[2].upper()
-    compile_only = len(sys.argv) > 3 and sys.argv[3].lower() == "compile"
     
-    compile_and_run(contest, problem, compile_only)
+    # Parse options
+    compile_only = False
+    manual_input = False
+    input_file = None
+    
+    i = 3
+    while i < len(sys.argv):
+        arg = sys.argv[i]
+        if arg.lower() == "compile":
+            compile_only = True
+        elif arg.lower() == "manual":
+            manual_input = True
+        elif arg == "-i" and i + 1 < len(sys.argv):
+            input_file = sys.argv[i + 1]
+            i += 1  # Skip the next argument
+        i += 1
+    
+    compile_and_run(contest, problem, compile_only, manual_input, input_file)
 
 if __name__ == "__main__":
     main() 

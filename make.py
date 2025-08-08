@@ -18,6 +18,7 @@ def create_problem(contest, problem):
     problems_dir = Path("problems")
     contest_dir = problems_dir / contest
     problem_file = contest_dir / f"{problem}.cpp"
+    input_file = contest_dir / "input.txt"
     
     # Create directories
     contest_dir.mkdir(parents=True, exist_ok=True)
@@ -32,8 +33,14 @@ def create_problem(contest, problem):
     # Copy template to new file
     shutil.copy2(template_path, problem_file)
     
+    # Create input.txt file if it doesn't exist
+    if not input_file.exists():
+        input_file.write_text("1\n")  # Default: 1 test case
+        print(f"Created {input_file}")
+    
     print(f"Created {problem_file}")
     print(f"Problem: Codeforces {contest}{problem}")
+    print(f"Edit {input_file} to add your test cases")
     print("Ready to solve!")
     return True
 
@@ -46,8 +53,8 @@ def show_help():
     print("  python make.py 1234 A")
     print()
     print("Examples:")
-    print("  python make.py 1789 B    # Creates problems/1789/B.cpp")
-    print("  python make.py 456 C     # Creates problems/456/C.cpp")
+    print("  python make.py 1789 B    # Creates problems/1789/B.cpp + input.txt")
+    print("  python make.py 456 C     # Creates problems/456/C.cpp + input.txt")
 
 def main():
     if len(sys.argv) != 3:
