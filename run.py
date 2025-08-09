@@ -22,7 +22,7 @@ def compile_and_run(contest, problem, compile_only=False, manual_input=False, in
     # Compile
     print(f"Compiling {cpp_file}...")
     result = subprocess.run([
-        "g++", "-o", str(exe_file), str(cpp_file)
+        "g++", "-std=c++17", "-o", str(exe_file), str(cpp_file)
     ], capture_output=True, text=True)
     
     if result.returncode != 0:
