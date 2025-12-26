@@ -19,10 +19,11 @@ def compile_and_run(contest, problem, compile_only=False, manual_input=False, in
         print(f"Error: {cpp_file} not found")
         return False
     
-    # Compile
+    # Compile with GCC using C++20 (matches Codeforces GCC 13-64)
     print(f"Compiling {cpp_file}...")
     result = subprocess.run([
-        "g++", "-std=c++17", "-o", str(exe_file), str(cpp_file)
+        "g++-15", "-std=c++20", "-O2", "-Wall", "-Wextra",
+        "-o", str(exe_file), str(cpp_file)
     ], capture_output=True, text=True)
     
     if result.returncode != 0:

@@ -35,7 +35,7 @@ def create_problem(contest, problem):
     
     # Create input.txt file if it doesn't exist
     if not input_file.exists():
-        input_file.write_text("1\n")  # Default: 1 test case
+        input_file.write_text("")  # Empty input file
         print(f"Created {input_file}")
     
     print(f"Created {problem_file}")
